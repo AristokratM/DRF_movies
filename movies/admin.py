@@ -17,7 +17,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class MovieAdminForm(forms.ModelForm):
-    description = forms.CharField(label="Опис_ru", widget=CKEditorUploadingWidget())
+    description = forms.CharField(label="Опис", widget=CKEditorUploadingWidget())
 
     class Meta:
         model = Movie
