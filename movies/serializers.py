@@ -38,10 +38,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class MovieListSerializer(serializers.ModelSerializer):
     """Список фільмів"""
+    rating_user = serializers.BooleanField()
+    middle_star = serializers.FloatField()
 
     class Meta:
         model = Movie
-        fields = ('title', 'tagline', 'category',)
+        fields = ('id', 'title', 'tagline', 'category', 'rating_user', 'middle_star')
 
 
 class MovieDetailSerializer(serializers.ModelSerializer):
@@ -59,6 +61,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
 
 class RatingSerializer(serializers.ModelSerializer):
     """Додавання рейтингу до користувачів"""
+
     class Meta:
         model = Rating
         fields = ('star', 'movie',)

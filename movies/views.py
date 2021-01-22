@@ -1,15 +1,21 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.db import models
 from .models import Movie, Review
-from .serializers import MovieListSerializer, MovieDetailSerializer, ReviewCreateSerializer, ReviewSerializer, RatingSerializer
+from .serializers import MovieListSerializer, MovieDetailSerializer, ReviewCreateSerializer, ReviewSerializer, \
+    RatingSerializer
+from .service import get_client_ip
 
 
 class MovieListView(APIView):
     """Вивід списку фільмів"""
 
     def get(self, request):
-        movies = Movie.objects.filter(draft=False)
+        movies = Movie.objects.filter(draft=False).annotate(
+            rating_user=models.Count("ratings", filter=models.Q(ratings__ip=get_client_ip(request)))
+        ).annotate(
+            middle_star=models.Avg("ratings__star")
+        )
         serializer = MovieListSerializer(movies, many=True)
         return Response(serializer.data)
 
@@ -45,18 +51,10 @@ class ReviewListView(APIView):
 class AddStarRatingView(APIView):
     """Додавання рейтингу до фільму"""
 
-    def get_client_ip(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
-
     def post(self, request):
         serializer = RatingSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(ip=self.get_client_ip(request))
+            serializer.save(ip=get_client_ip(request))
             return Response(status=201)
         else:
             return Response(status=400)
