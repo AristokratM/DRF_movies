@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 
@@ -9,5 +9,7 @@ urlpatterns = [
     path('reviews/', views.ReviewListView.as_view()),
     path('rating/', views.AddStarRatingView.as_view()),
     path('actors/', views.ActorListView.as_view()),
-    path('actor/<int:pk>', views.ActorDetailView.as_view())
+    path('actor/<int:pk>', views.ActorDetailView.as_view()),
+
+
 ]
