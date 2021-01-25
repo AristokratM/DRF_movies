@@ -3,13 +3,15 @@ from django.db import models
 from .models import Movie, Review, Actor
 from .serializers import MovieListSerializer, MovieDetailSerializer, ReviewCreateSerializer, ReviewSerializer, \
     RatingSerializer, ActorListSerializer, ActorDetailSerializer
-from .service import get_client_ip
+from .service import get_client_ip, MovieFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class MovieListView(generics.ListAPIView):
     """Вивід списку фільмів"""
     serializer_class = MovieListSerializer
-
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = MovieFilter
     def get_queryset(self):
         movies = Movie.objects.filter(draft=False).annotate(
             rating_user=models.Count("ratings", filter=models.Q(ratings__ip=get_client_ip(self.request)))
